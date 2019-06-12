@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <title>动态表单</title>
+
+    <style>
+
+        /* div {
+             border: solid red;
+         }*/
+
+        #div1 {
+            width: 650px;
+            height: 70px;
+            margin-top: 80px;
+            margin-left: 300px;
+        }
+
+        #div2 {
+            width: 650px;
+            margin-top: 0px;
+            margin-left: 250px;
+        }
+
+        input {
+            width: 150px;
+            height: 20px;
+        }
+
+        #add {
+            width: 50px;
+            height: 25px;
+        }
+
+        th, td {
+            width: 150px;
+            height: 40px;
+            text-align: center;
+        }
+
+    </style>
+
+
+</head>
+
+<body>
+
+<div id="div1">
+
+    <input id="id" type="text" placeholder="输入编号" align="center"/>
+    <input type="text" id="name" placeholder="输入姓名" align="center"/>
+    <input type="text" id="sex" placeholder="输入性别" align="center"/>
+    <input type="button" id="add" value="添加"/>
+</div>
+
+<div id="div2">
+    <table border="1" id="table" cellspacing="0" align="center">
+
+        <tr>
+            <th>编号</th>
+            <th>姓名</th>
+            <th>性别</th>
+            <th>操作</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>张三</td>
+            <td>男</td>
+            <td><a href="javascript:void(0)" name="del" onclick="delLine(this)">删除</a></td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>李四</td>
+            <td>男</td>
+            <td><a href="javascript:void(0)" onclick="delLine(this)">删除</a></td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>王五</td>
+            <td>男</td>
+            <td><a href="javascript:void(0)" onclick="delLine(this)">删除</a></td>
+        </tr>
+
+    </table>
+</div>
+
+
+<script>
+
+
+    /*添加表格内容*/
+    //添加按钮设置鼠标单击事件
+    document.getElementById("add").onclick = function () {
+        //获取文本框内容
+        var id = document.getElementById("id").value;
+        var name = document.getElementById("name").value;
+        var sex = document.getElementById("sex").value;
+        //创建编号的文本节点  再创建td元素，把这个文本节点添加进去
+        var idTextNode = document.createTextNode(id);
+        var idTd = document.createElement("td");
+        idTd.appendChild(idTextNode);
+
+        var nameTextNode = document.createTextNode(name);
+        var nameTd = document.createElement("td");
+        nameTd.appendChild(nameTextNode);
+
+        var sexTextNode = document.createTextNode(sex);
+        var sexTd = document.createElement("td");
+        sexTd.appendChild(sexTextNode);
+
+        //TextNode---><a>--->td
+        var delTextNode = document.createTextNode("删除");
+        var Link = document.createElement("a");
+        Link.setAttribute("href", "javascript:void(0)");
+        Link.setAttribute("onclick", "delLine(this)");
+        Link.appendChild(delTextNode);
+        var delTd = document.createElement("td");
+        delTd.appendChild(Link);
+
+        //创建tr元素，把这些td添加进去
+        var infoTr = document.createElement("tr");
+        infoTr.appendChild(idTd);
+        infoTr.appendChild(nameTd);
+        infoTr.appendChild(sexTd);
+        infoTr.appendChild(delTd);
+
+        //获取table元素，把tr添加进去
+        var table = document.getElementById("table");
+        table.appendChild(infoTr)
+    }
+
+
+    /*删除表格内容*/
+    function delLine(obj) {
+        var table = obj.parentNode.parentNode.parentNode;
+        table.removeChild(obj.parentNode.parentNode);
+    }
+
+
+</script>
+</body>
+</html>

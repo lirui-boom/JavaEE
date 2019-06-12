@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <style>
+        .div_1 {
+            width: 300px;
+            height: 50px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        td {
+            text-align: center;
+        }
+    </style>
+
+</head>
+<body>
+<div class="div_1">用户注册</div>
+<form action="/demo/demo1" method="post">
+    <table border="0" width="300">
+        <tr>
+            <td width="150" bgcolor="#a9a9a9">登录用户名</td>
+            <td width="150"><input type="text" name="username" id="username"></td>
+        </tr>
+        <tr>
+            <td width="150" bgcolor="#a9a9a9">登录密码</td>
+            <td width="150"><input type="password" name="password" id="password"></td>
+        </tr>
+
+        <tr>
+            <td><input type="submit" value="提交" id="btn"></td>
+            <td><input type="button" value="取消"></td>
+        </tr>
+    </table>
+</form>
+<script>
+
+
+    function checkUsernaem(username) {
+        var flag = true;
+        if (username.length == 0) {
+            alert("用户名不能为空！")
+            flag = false;
+        }
+        var regexp = /^[a-zA-Z]{6,20}/;
+        if (!regexp.test(username)) {
+            alert("非法的用户名！")
+            flag = false
+        }
+        return flag;
+    }
+
+    function checkPassword(password) {
+        var flag = true;
+        if (password.length == 0) {
+            alert("密码不能为空！")
+            flag = false;
+        }
+        if (!(password.length >= 6 && password.length <= 20)) {
+            alert("密码必须是6-20位的字符！");
+            flag = false;
+        }
+        if (password == username) {
+            alert("密码不能和账号一样！")
+            flag = false;
+        }
+
+        return flag;
+    }
+
+
+
+
+
+    function check() {
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+        var repassword = document.getElementById("repassword").value;
+        var email = document.getElementById("email").value;
+        if (checkUsernaem(username) && checkPassword(password)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    var submit = document.getElementById("btn").onclick = function (ev) {
+        return check();
+    }
+
+</script>
+</body>
+</html>
