@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>注册我们的网站</title>
+
+    <!-- CSS -->
+    <!--<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">-->
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/form-elements.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Javascript -->
+    <script src="assets/js/jquery-1.11.1.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/jquery.backstretch.min.js"></script>
+    <script src="assets/js/jquery-3.3.1.min.js"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]-->
+    <script src="assets/js/html5shiv.js"></script>
+    <script src="assets/js/respond.min.js"></script>
+
+    <!--[endif]-->
+
+    <!-- Favicon and touch icons -->
+    <link rel="shortcut icon" href="assets/ico/favicon.png">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+
+    <style>
+        body {
+            background-image: url("assets/img/backgrounds/2.jpg");
+        }
+    </style>
+
+    <script>
+
+
+        $(function () {
+
+            //email获取焦点
+            $("#email").focus(function () {
+                var email_tips = $("#email_tips");
+                email_tips.html("用户名设置后不可更改");
+            });
+
+            ///email失去焦点
+            $("#email").focusout(function () {
+
+                var email = $("#email");
+                if (checkEmail(email.val())) {
+                    $.get("/checkUsernameServlet", {"email": email.val()}, function (data) {
+
+                        var email_tips = $("#email_tips");
+                        email_tips.html(data.email_msg);
+                    },"json");
+                }
+
+            });
+
+            //密码输入框获得焦点
+            $("#password").focus(function () {
+
+                var password_tips = $("#password_tips");
+                password_tips.html("密码必须由6-20个字母、数字、下划线组成");
+
+            });
+
+            //密码输入框失去焦点
+            $("#password").focusout(function () {
+
+                var password = $("#password");
+                if(checkPassword(password.val())){
+                    var password_tips = $("#password_tips");
+                    password_tips.html("密码可用");
+                }
+
+            });
+
+            //重复密码输入框获得焦点
+            $("#repassword").focus(function () {
+
+                var repassword_tips = $("#repassword_tips");
+                repassword_tips.html("请再次输入密码");
+
+            });
+
+            //重复密码输入框失去焦点
+            $("#repassword").focusout(function () {
+
+                var password = $("#password");
+                var repassword = $("#repassword");
+                if(checkRepassword(password.val(), repassword.val())){
+                    var repassword_tips = $("#repassword_tips");
+                    repassword_tips.html("输入正确");
+                }
+
+            });
+
+
+        });
+
+        //验证邮箱合法性
+        //以大写字母[A-Z]、小写字母[a-z]、数字[0-9]、下滑线[_]、减号[-]及点号[.]开头，并需要重复一次至多次[+]。
+        //中间必须包括@符号。
+        //@之后需要连接大写字母[A-Z]、小写字母[a-z]、数字[0-9]、下滑线[_]、减号[-]及点号[.]，并需要重复一次至多次[+]。
+        //结尾必须是点号[.]连接2至4位的大小写字母[A-Za-z]{2,4}。
+        function checkEmail(email) {
+            var flag = true;
+            var pattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+            if (!pattern.test(email)) {
+                $("#email_tips").html("请输入正确的邮箱地址");
+                flag = false;
+            }
+            return flag;
+        }
+
+        //校验密码：只能输入6-20个字母、数字、下划线
+        function checkPassword(password) {
+            var flag = true;
+            var pattern = /^(\w){6,20}$/;//只能输入6-20个字母、数字、下划线
+            if (!pattern.test(password)) {
+                $("#password_tips").html("请输入有效的密码");
+                flag = false;
+            }
+            return flag;
+        }
+
+        //校验验证码
+        function checkCode(checkcode) {
+            var flag = true;
+
+            if (checkcode.length == 0) {
+                $("#checkcode_tips").html("请输入验证码");
+                flag = false;
+            }
+            return flag;
+        }
+
+        //校验重复密码
+        function checkRepassword(password,repassword) {
+            var flag = true;
+
+            if (password != repassword) {
+                $("#repassword_tips").html("两次输入的密码不一致");
+                flag = false;
+            }
+            if(repassword.length == 0){
+                $("#repassword_tips").html("请再次输入密码");
+                flag = false;
+            }
+            return flag;
+        }
+
+
+       //更换验证码
+       function changeCheckImage() {
+           var checkImage = $("#checkImage");
+           var time = new Date().getTime();
+           checkImage.prop("href","/checkCodeImagServlet?" + time);
+       }
+
+
+       function isOK() {
+           var email = $("#email").val();
+           var password = $("#password").val();
+           var repassword = $("#repassword").val();
+           var checkcode = $("#checkcode").val();
+           if(checkEmail(email)&checkPassword(password)&checkRepassword(password,repassword)&checkCode(checkcode)){
+               return true;
+           }else {
+               return false;
+           }
+       }
+
+    </script>
+
+</head>
+
+<body id="body" class="trans_fade_image">
+
+<!-- Top content -->
+<div class="top-content">
+
+    <div class="inner-bg">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 form-box">
+                    <div class="form-top">
+                        <div class="form-top-left">
+                            <h3>注册我们的网站</h3>
+                            <p>输入您的邮箱和密码：</p>
+                        </div>
+                        <div class="form-top-right">
+                            <i class="fa fa-lock"></i>
+                        </div>
+                    </div>
+                    <div class="form-bottom">
+                        <form role="form" method="post" class="login-form" action="registerServlet">
+
+                            <div class="form-group">
+                                <label class="sr-only">Email</label>
+                                <input type="text" name="email" placeholder="邮箱..." class="form-username form-control"
+                                       id="email"><span id="email_tips" style="color: red;text-align: center"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="sr-only">Password</label>
+                                <input type="password" name="password" placeholder="密码..."
+                                       class="form-password form-control" id="password">
+                                <span id="password_tips" style="color: red;text-align: center"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="sr-only">Repassword</label>
+                                <input type="password" name="repassword" placeholder="再次输入密码..."
+                                       class="form-password form-control" id="repassword">
+                                <span id="repassword_tips" style="color: red;text-align: center"></span>
+                            </div>
+
+                            <div class="form-group" style="width: 60%;float: left">
+                                <label class="sr-only">验证码</label>
+                                <input type="text" name="checkcode" placeholder="验证码..."
+                                       class="form-username form-control" id="checkcode">
+                                <span id="checkcode_tips" style="color: red;text-align: center"></span>
+                            </div>
+                            <div style="width: 30%;height:50px;float: left;border: solid #d5d5d5;margin-left: 5%">
+                                <img src="/checkCodeImagServlet" id="checkImage"
+                                     style="width: 100%;height: 100%" onclick="changeCheckImage()">
+                            </div>
+
+                            <button type="submit" class="btn" id="btn" onclick="return isOK();">注册</button>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 5%;">
+                <p>
+                    <button type="button" class="btn">前往登录</button>
+                </p>
+            </div>
+            <div class="row" style="margin-top: 5%">
+                <p>Create By BOOM : 2495399053@qq.com</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+</body>
+
+</html>
