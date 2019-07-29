@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>注册</title>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" href="css/register.css">
+    <!--导入jquery-->
+    <script src="js/jquery-3.3.1.js"></script>
+
+    <script>
+
+
+        $(function () {
+
+            //email获取焦点
+            $("#email").focus(function () {
+                var email_tips = $("#email_tips");
+                email_tips.html("用户名设置后不可更改");
+            });
+
+            ///email失去焦点
+            $("#email").focusout(function () {
+
+                var email = $("#email");
+                if (checkEmail(email.val())) {
+                    $.get("/user/checkEmail", {"email": email.val()}, function (data) {
+
+                        if (!data.email_usable) {
+                            $("#email").css("border", "3px solid red");
+                            $("#btn_sub").prop("disabled", true);
+                        } else {
+                            $("#email").css("border", "");
+                            $("#btn_sub").prop("disabled", false);
+                        }
+                        var email_tips = $("#email_tips");
+                        email_tips.html(data.email_msg);
+                    }, "json");
+                }
+
+            });
+
+            //密码输入框获得焦点
+            $("#password").focus(function () {
+
+                var password_tips = $("#password_tips");
+                password_tips.html("密码必须由6-20个字母、数字、下划线组成");
+
+            });
+
+            //密码输入框失去焦点
+            $("#password").focusout(function () {
+
+                var password = $("#password");
+                if (checkPassword(password.val())) {
+                    var password_tips = $("#password_tips");
+                    password_tips.html("密码可用");
+                }
+
+            });
+
+            //重复密码输入框获得焦点
+            $("#repassword").focus(function () {
+
+                var repassword_tips = $("#repassword_tips");
+                repassword_tips.html("请再次输入密码");
+
+            });
+
+            //重复密码输入框失去焦点
+            $("#repassword").focusout(function () {
+
+                var password = $("#password");
+                var repassword = $("#repassword");
+                if (checkRepassword(password.val(), repassword.val())) {
+                    var repassword_tips = $("#repassword_tips");
+                    repassword_tips.html("输入正确");
+                }
+
+            });
+
+            //提交事件
+            $("#registerForm").submit(function () {
+
+                var email = $("#email").val();
+                var password = $("#password").val();
+                var repassword = $("#repassword").val();
+                var checkcode = $("#checkcode").val();
+                if (checkEmail(email) & checkPassword(password) & checkRepassword(password, repassword) & checkCode(checkcode)) {
+
+                    $.post("/user/register", $("#registerForm").serialize(), function (data) {
+
+                        if (!data.flag) {
+
+                            $("#msg").html(data.errorMsg);
+
+                            changeCheckCode();
+                        }else {
+                            //跳转页面
+                            location.href = "register_ok.html";
+                        }
+
+                    }, "json");
+                }
+
+                return false;
+
+            });
+
+
+        });
+
+
+        //校验邮箱
+        function checkEmail(email) {
+            var flag = true;
+            var pattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+            if (!pattern.test(email)) {
+                $("#email_tips").html("请输入正确的邮箱地址");
+                flag = false;
+            }
+
+            if (flag == false) {
+                $("#email").css("border", "1px solid red");
+            } else {
+                $("#email").css("border", "");
+            }
+
+            return flag;
+        }
+
+        //校验密码：只能输入6-20个字母、数字、下划线
+        function checkPassword(password) {
+            var flag = true;
+            var pattern = /^(\w){6,20}$/;//只能输入6-20个字母、数字、下划线
+            if (!pattern.test(password)) {
+                $("#password_tips").html("请输入有效的密码");
+                flag = false;
+            }
+
+            if (flag == false) {
+                $("#password").css("border", "1px solid red");
+            } else {
+                $("#password").css("border", "");
+            }
+
+            return flag;
+        }
+
+        //校验验证码
+        function checkCode(checkcode) {
+            var flag = true;
+
+            if (checkcode.length == 0) {
+                $("#checkcode_tips").html("请输入验证码");
+                flag = false;
+            }
+
+            if (flag == false) {
+                $("#checkcode").css("border", "1px solid red");
+            } else {
+                $("#checkcode").css("border", "");
+            }
+
+            return flag;
+        }
+
+        //校验重复密码
+        function checkRepassword(password, repassword) {
+            var flag = true;
+
+            if (password != repassword) {
+                $("#repassword_tips").html("两次输入的密码不一致");
+                flag = false;
+            }
+            if (repassword.length == 0) {
+                $("#repassword_tips").html("请再次输入密码");
+
+                flag = false;
+            }
+
+            if (flag == false) {
+                $("#repassword").css("border", "1px solid red");
+            } else {
+                $("#repassword").css("border", "");
+            }
+            return flag;
+        }
+
+        function changeCheckCode() {
+            $("#checkcodeimage").prop("src", "/user/checkCodeImage?" + new Date().getTime());
+        }
+
+
+    </script>
+</head>
+<body>
+<!--引入头部-->
+<div id="header"></div>
+<!-- 头部 end -->
+<div class="rg_layout">
+    <div class="rg_form clearfix">
+        <div class="rg_form_left">
+            <p>新用户注册</p>
+            <p>USER REGISTER</p>
+        </div>
+        <div class="rg_form_center">
+
+            <!--注册表单-->
+            <form id="registerForm" method="post">
+                <!--提交处理请求的标识符-->
+                <input type="hidden" name="action" value="register">
+                <table style="margin-top: 25px;">
+
+                    <tr>
+                        <td class="td_left">
+                            <label for="email">Email</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="text" id="email" name="email" placeholder="请输入Email" autocomplete="off">
+                        </td>
+                    </tr>
+                    <tr style="height: 15px;text-align: center">
+                        <td></td>
+                        <td>
+                            <span id="email_tips" style="color: red"></span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="td_left">
+                            <label for="password">密码</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="text" id="password" name="password" placeholder="请输入密码" autocomplete="off">
+                        </td>
+
+                    </tr>
+                    <tr style="height: 15px;text-align: center">
+                        <td></td>
+                        <td class="td_right">
+                            <span id="password_tips" style="color: red"></span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="td_left">
+                            <label for="password">重复密码</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="text" id="repassword" name="repassword" placeholder="请再次输入密码" autocomplete="off">
+                        </td>
+
+                    </tr>
+                    <tr style="height: 15px;text-align: center">
+                        <td></td>
+                        <td class="td_right">
+                            <span id="repassword_tips" style="color: red"></span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="td_left">
+                            <label for="checkcode">验证码</label>
+                        </td>
+                        <td class="td_right check">
+                            <input type="text" id="checkcode" name="checkcode" class="check" placeholder="输入验证码" autocomplete="off">
+                            <img src="/user/checkCodeImage" height="32px" alt="" id="checkcodeimage"
+                                 onclick="changeCheckCode(this)">
+                        </td>
+                    </tr>
+                    <tr style="height: 15px;text-align: center">
+                        <td></td>
+                        <td class="td_right">
+                            <span id="checkcode_tips" style="color: red"></span>
+                        </td>
+                    </tr>
+                    <div id="errorMsg" style="color: red"></div>
+
+                    <tr>
+                        <td class="td_left"></td>
+                        <td class="td_right check">
+                            <span id="msg" style="color: red;"></span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="td_left">
+                        </td>
+                        <td class="td_right check">
+                            <input type="submit" class="submit" value="注册" id="btn_sub">
+
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="rg_form_right">
+            <p>
+                已有账号？
+                <a href="login.html">立即登录</a>
+            </p>
+        </div>
+    </div>
+</div>
+<!--引入尾部-->
+<div id="footer"></div>
+<!--导入布局js，共享header和footer-->
+<script type="text/javascript" src="js/include.js"></script>
+
+</body>
+</html>
