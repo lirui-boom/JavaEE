@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping>
+
+<class name="cn.boom.Demo2.Course" table="sys_course">
+    <id name="c_id">
+        <generator class="identity"/>
+    </id>
+    <property name="c_code"></property>
+    <property name="c_info"></property>
+
+    <!-- 被动方放弃表的维护权-->
+    <set name="students" table="sys_student_course" inverse="true">
+        <key column="cid"></key>
+        <many-to-many class="cn.boom.Demo2.Student" column="sid"></many-to-many>
+    </set>
+</class>
+
+
+</hibernate-mapping>
